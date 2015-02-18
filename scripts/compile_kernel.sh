@@ -170,5 +170,7 @@ else
   FINAL_BUILD_RESULTS=$SRC_DIR/output
 fi
 
+echo "###############"
+echo "### Copy deb packages to $FINAL_BUILD_RESULTS"
 mkdir -p $FINAL_BUILD_RESULTS
 cp $BUILD_RESULTS/*.deb $FINAL_BUILD_RESULTS
