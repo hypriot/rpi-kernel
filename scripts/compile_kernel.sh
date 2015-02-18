@@ -152,4 +152,6 @@ done
 create_kernel_deb_packages
 
 # copy build results to synced vagrant host folder
- cp -R $BUILD_RESULTS/*.deb vagrant/build_results
+FINAL_BUILD_RESULTS=/vagrant/build_results/$NEW_VERSION
+mkdir -p $FINAL_BUILD_RESULTS
+cp $BUILD_RESULTS/*.deb $FINAL_BUILD_RESULTS
