@@ -1,0 +1,13 @@
+#!/bin/sh -e
+FILES="bootcode.bin fixup.dat fixup_cd.dat fixup_x.dat kernel.img kernel7.img
+  kernel_cutdown.img kernel_emergency.img kernel7_emergency.img start.elf start_cd.elf start_x.elf"
+
+# dpkg-divert will error out otherwise
+mkdir -p /usr/share/rpikernelhack
+
+for FN in $FILES; do
+  dpkg-divert --package rpikernelhack --divert /usr/share/rpikernelhack/$FN \
+    /boot/$FN
+done
+
+#DEBHELPER#

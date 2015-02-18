@@ -1,0 +1,18 @@
+#!/bin/sh -e
+FILES="bootcode.bin fixup.dat fixup_cd.dat fixup_x.dat kernel.img kernel7.img
+  kernel_cutdown.img kernel_emergency.img kernel7_emergency.img start.elf start_cd.elf start_x.elf"
+
+printf "Memory split is now set in /boot/config.txt.\n"
+printf "You may want to use raspi-config to set it\n"
+
+
+for FN in $FILES; do
+  # Need to rm first to avoid error "rename involves overwriting ... with 
+  # different file ..., not allowed
+  rm -f /boot/$FN
+  dpkg-divert --package rpikernelhack --remove --rename /boot/$FN
+  sync
+done
+
+
+#DEBHELPER#
