@@ -75,17 +75,17 @@ function prepare_kernel_building () {
   setup_rpi_firmware
 }
 
+
 create_kernel_for () {
   echo "###############"
   echo "### START building kernel for ${PI_VERSION}"
 
   local PI_VERSION=$1
 
-  # change directory to raspberry pi linux kernel
   cd $LINUX_KERNEL
 
-  # remove all generated files + config + various backup files
-  ARCH=arm CROSS_COMPILE=${CCPREFIX[${PI_VERSION}]} make mrproper
+  # clean build artifacts
+  make ARCH=arm clean
 
   # copy kernel configuration file over
   cp $LINUX_KERNEL_CONFIGS/${PI_VERSION}_docker_kernel_config $LINUX_KERNEL/.config
@@ -104,31 +104,32 @@ create_kernel_for () {
   echo "### Check the $BUILD_RESULTS/$PI_VERSION/kernel.img and $BUILD_RESULTS/$PI_VERSION/modules directory on your host machine."
 }
 
-function create_kernel_deb_packages_for () {
+function create_kernel_deb_packages () {
   echo "###############"
   echo "### START building kernel DEBIAN PACKAGES"
 
-  local PI_VERSION=$1
   PKG_TMP=`mktemp -d`
 
-  NEW_FIRMWARE=$PKG_TMP/raspberrypi-firmware_${NEW_VERSION}
+  NEW_KERNEL=$PKG_TMP/raspberrypi-kernel-${NEW_VERSION}
 
-  create_dir_for_build_user $NEW_FIRMWARE
+  create_dir_for_build_user $NEW_KERNEL
 
   # copy over source files for building the packages
-  cp -r $RASPBERRY_FIRMWARE/* $NEW_FIRMWARE/
-  cp -r /vagrant/debian $NEW_FIRMWARE/debian
-  touch $NEW_FIRMWARE/debian/files
+  cp -r $RASPBERRY_FIRMWARE/* $NEW_KERNEL
+  cp -r /vagrant/debian $NEW_KERNEL/debian
+  touch $NEW_KERNEL/debian/files
 
-  cp $BUILD_RESULTS/$PI_VERSION/${IMAGE_NAME[${PI_VERSION}]} $NEW_FIRMWARE/boot
-  cp -R $BUILD_RESULTS/$PI_VERSION/modules $NEW_FIRMWARE
+  for pi_version in ${!CCPREFIX[@]}; do
+    cp $BUILD_RESULTS/$pi_version/${IMAGE_NAME[${pi_version}]} $NEW_KERNEL/boot
+    cp -R $BUILD_RESULTS/$pi_version/modules/* $NEW_KERNEL/modules
+  done
 
   # build debian packages
-  cd $NEW_FIRMWARE
+  cd $NEW_KERNEL
 
   dch -v ${NEW_VERSION} --package raspberrypi-firmware 'add Hypriot custom kernel'
   debuild --no-lintian -ePATH=${PATH}:$ARM_TOOLS/$X64_CROSS_COMPILE_CHAIN/bin -b -aarmhf -us -uc
-  cp ../*.deb $BUILD_RESULTS/$PI_VERSION
+  cp ../*.deb $BUILD_RESULTS
 
   echo "###############"
   echo "### FINISH building kernel DEBIAN PACKAGES"
@@ -142,11 +143,13 @@ function create_kernel_deb_packages_for () {
 # setup necessary build environment: dir, repos, etc.
 prepare_kernel_building
 
-# create kernel, associated modules and debain packages
-for pi_version in "rpi1" "rpi2"; do
+# create kernel, associated modules
+for pi_version in ${!CCPREFIX[@]}; do
   create_kernel_for $pi_version
-  create_kernel_deb_packages_for $pi_version
 done
 
+# create kernel packages
+create_kernel_deb_packages
+
 # copy build results to synced vagrant host folder
-cp -R $BUILD_RESULTS /vagrant/build_results
+ cp -R $BUILD_RESULTS/*.deb vagrant/build_results
