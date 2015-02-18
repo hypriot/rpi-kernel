@@ -121,7 +121,7 @@ function create_kernel_deb_packages () {
 
   for pi_version in ${!CCPREFIX[@]}; do
     cp $BUILD_RESULTS/$pi_version/${IMAGE_NAME[${pi_version}]} $NEW_KERNEL/boot
-    cp -R $BUILD_RESULTS/$pi_version/modules/* $NEW_KERNEL/modules
+    cp -R $BUILD_RESULTS/$pi_version/modules/lib/modules/* $NEW_KERNEL/modules
   done
 
   # build debian packages
