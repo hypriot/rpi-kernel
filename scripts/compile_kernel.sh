@@ -158,5 +158,9 @@ for pi_version in "rpi1" "rpi2"; do
   create_kernel_deb_packages_for $pi_version
 done
 
-# copy build results to synced vagrant host folder
-cp -R $BUILD_RESULTS /vagrant/build_results
+# running in vagrant VM
+if [ -d /vagrant ]; then
+  # copy build results to synced vagrant host folder
+  cp -R $BUILD_RESULTS $SRC_DIR/build_results
+fi
+
