@@ -20,6 +20,8 @@ if [ -d /vagrant ]; then
 else
   # running in drone build
   SRC_DIR=`pwd`
+  BUILD_USER=`whoami`
+  BUILD_GROUP=`whoami`
 fi
 
 LINUX_KERNEL_CONFIGS=$SRC_DIR/kernel_configs
