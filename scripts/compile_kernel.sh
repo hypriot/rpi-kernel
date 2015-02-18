@@ -126,7 +126,7 @@ function create_kernel_deb_packages () {
 
   # copy over source files for building the packages
   cp -r $RASPBERRY_FIRMWARE/* $NEW_KERNEL
-  cp -r /vagrant/debian $NEW_KERNEL/debian
+  cp -r $SRC_DIR/debian $NEW_KERNEL/debian
   touch $NEW_KERNEL/debian/files
 
   for pi_version in ${!CCPREFIX[@]}; do
@@ -165,6 +165,10 @@ create_kernel_deb_packages
 if [ -d /vagrant ]; then
   # copy build results to synced vagrant host folder
   FINAL_BUILD_RESULTS=/vagrant/build_results/$NEW_VERSION
-  mkdir -p $FINAL_BUILD_RESULTS
-  cp $BUILD_RESULTS/*.deb $FINAL_BUILD_RESULTS
+else
+  # running in drone build
+  FINAL_BUILD_RESULTS=$SRC_DIR/output
 fi
+
+mkdir -p $FINAL_BUILD_RESULTS
+cp $BUILD_RESULTS/*.deb $FINAL_BUILD_RESULTS
