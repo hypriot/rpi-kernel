@@ -14,7 +14,15 @@ ARM_TOOLS=$BUILD_CACHE/tools
 LINUX_KERNEL=$BUILD_CACHE/linux-kernel
 RASPBERRY_FIRMWARE=$BUILD_CACHE/rpi_firmware
 
-LINUX_KERNEL_CONFIGS=/vagrant/kernel_configs
+if [ -d /vagrant ]; then
+  # running in vagrant VM
+  SRC_DIR=/vagrant
+else
+  # running in drone build
+  SRC_DIR=`pwd`
+fi
+
+LINUX_KERNEL_CONFIGS=$SRC_DIR/kernel_configs
 
 NEW_VERSION=`date +%Y%m%d-%H%M%S`
 BUILD_RESULTS=$BUILD_ROOT/results/kernel-$NEW_VERSION
@@ -117,7 +125,7 @@ function create_kernel_deb_packages_for () {
 
   # copy over source files for building the packages
   cp -r $RASPBERRY_FIRMWARE/* $NEW_FIRMWARE/
-  cp -r /vagrant/debian $NEW_FIRMWARE/debian
+  cp -r $SRC_DIR/debian $NEW_FIRMWARE/debian
   touch $NEW_FIRMWARE/debian/files
 
   cp $BUILD_RESULTS/$PI_VERSION/${IMAGE_NAME[${PI_VERSION}]} $NEW_FIRMWARE/boot
