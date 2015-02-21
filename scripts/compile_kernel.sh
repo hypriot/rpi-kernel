@@ -14,7 +14,17 @@ ARM_TOOLS=$BUILD_CACHE/tools
 LINUX_KERNEL=$BUILD_CACHE/linux-kernel
 RASPBERRY_FIRMWARE=$BUILD_CACHE/rpi_firmware
 
-LINUX_KERNEL_CONFIGS=/vagrant/kernel_configs
+if [ -d /vagrant ]; then
+  # running in vagrant VM
+  SRC_DIR=/vagrant
+else
+  # running in drone build
+  SRC_DIR=`pwd`
+  BUILD_USER=`whoami`
+  BUILD_GROUP=`whoami`
+fi
+
+LINUX_KERNEL_CONFIGS=$SRC_DIR/kernel_configs
 
 NEW_VERSION=`date +%Y%m%d-%H%M%S`
 BUILD_RESULTS=$BUILD_ROOT/results/kernel-$NEW_VERSION
@@ -116,7 +126,7 @@ function create_kernel_deb_packages () {
 
   # copy over source files for building the packages
   cp -r $RASPBERRY_FIRMWARE/* $NEW_KERNEL
-  cp -r /vagrant/debian $NEW_KERNEL/debian
+  cp -r $SRC_DIR/debian $NEW_KERNEL/debian
   touch $NEW_KERNEL/debian/files
 
   for pi_version in ${!CCPREFIX[@]}; do
@@ -151,7 +161,16 @@ done
 # create kernel packages
 create_kernel_deb_packages
 
-# copy build results to synced vagrant host folder
-FINAL_BUILD_RESULTS=/vagrant/build_results/$NEW_VERSION
+# running in vagrant VM
+if [ -d /vagrant ]; then
+  # copy build results to synced vagrant host folder
+  FINAL_BUILD_RESULTS=/vagrant/build_results/$NEW_VERSION
+else
+  # running in drone build
+  FINAL_BUILD_RESULTS=$SRC_DIR/output
+fi
+
+echo "###############"
+echo "### Copy deb packages to $FINAL_BUILD_RESULTS"
 mkdir -p $FINAL_BUILD_RESULTS
 cp $BUILD_RESULTS/*.deb $FINAL_BUILD_RESULTS
