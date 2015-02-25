@@ -94,6 +94,10 @@ create_kernel_for () {
 
   cd $LINUX_KERNEL
 
+  # save git commit id of this build
+  local KERNEL_COMMIT=`git rev-parse HEAD`
+  echo "### git commit id of this kernel build is ${KERNEL_COMMIT}"
+
   # clean build artifacts
   make ARCH=arm clean
 
@@ -102,13 +106,16 @@ create_kernel_for () {
 
   echo "### building kernel"
   mkdir -p $BUILD_RESULTS/$PI_VERSION
+  echo $KERNEL_COMMIT > $BUILD_RESULTS/kernel-commit.txt
   ARCH=arm CROSS_COMPILE=${CCPREFIX[$PI_VERSION]} make -j$NUM_CPUS -k
   cp $LINUX_KERNEL/arch/arm/boot/Image $BUILD_RESULTS/$PI_VERSION/${IMAGE_NAME[${PI_VERSION}]}
 
   echo "### building kernel modules"
   mkdir -p $BUILD_RESULTS/$PI_VERSION/modules
   ARCH=arm CROSS_COMPILE=${CCPREFIX[${PI_VERSION}]} INSTALL_MOD_PATH=$BUILD_RESULTS/$PI_VERSION/modules make modules_install -j$NUM_CPUS
-
+  echo "### building deb packages"
+  KBUILD_DEBARCH=armhf ARCH=arm CROSS_COMPILE=${CCPREFIX[${PI_VERSION}]} make deb-pkg
+  mv ../*.deb $BUILD_RESULTS
   echo "###############"
   echo "### END building kernel for ${PI_VERSION}"
   echo "### Check the $BUILD_RESULTS/$PI_VERSION/kernel.img and $BUILD_RESULTS/$PI_VERSION/modules directory on your host machine."
@@ -167,10 +174,11 @@ if [ -d /vagrant ]; then
   FINAL_BUILD_RESULTS=/vagrant/build_results/$NEW_VERSION
 else
   # running in drone build
-  FINAL_BUILD_RESULTS=$SRC_DIR/output
+  FINAL_BUILD_RESULTS=$SRC_DIR/output/$NEW_VERSION
 fi
 
 echo "###############"
 echo "### Copy deb packages to $FINAL_BUILD_RESULTS"
 mkdir -p $FINAL_BUILD_RESULTS
 cp $BUILD_RESULTS/*.deb $FINAL_BUILD_RESULTS
+cp $BUILD_RESULTS/*.txt $FINAL_BUILD_RESULTS
