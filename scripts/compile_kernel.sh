@@ -115,7 +115,7 @@ create_kernel_for () {
   ARCH=arm CROSS_COMPILE=${CCPREFIX[${PI_VERSION}]} INSTALL_MOD_PATH=$BUILD_RESULTS/$PI_VERSION/modules make modules_install -j$NUM_CPUS
   echo "### building deb packages"
   KBUILD_DEBARCH=armhf ARCH=arm CROSS_COMPILE=${CCPREFIX[${PI_VERSION}]} make deb-pkg
-  mv ../*.deb $BUILD_RESULTS/$PI_VERSION
+  mv ../*.deb $BUILD_RESULTS
   echo "###############"
   echo "### END building kernel for ${PI_VERSION}"
   echo "### Check the $BUILD_RESULTS/$PI_VERSION/kernel.img and $BUILD_RESULTS/$PI_VERSION/modules directory on your host machine."
@@ -181,5 +181,4 @@ echo "###############"
 echo "### Copy deb packages to $FINAL_BUILD_RESULTS"
 mkdir -p $FINAL_BUILD_RESULTS
 cp $BUILD_RESULTS/*.deb $FINAL_BUILD_RESULTS
-mkdir -p $FINAL_BUILD_RESULTS/$NEW_VERSION
 cp $BUILD_RESULTS/*.txt $FINAL_BUILD_RESULTS
