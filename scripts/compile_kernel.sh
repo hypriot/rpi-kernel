@@ -95,7 +95,7 @@ create_kernel_for () {
   cd $LINUX_KERNEL
 
   # add kernel branding for hyprOS
-  sed -i 's/^EXTRAVERSION =.*/EXTRAVERSION = -hyprOS/g' Makefile
+  sed -i 's/^EXTRAVERSION =.*/EXTRAVERSION = -hypriot/g' Makefile
 
   # save git commit id of this build
   local KERNEL_COMMIT=`git rev-parse HEAD`
