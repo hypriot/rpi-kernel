@@ -113,6 +113,12 @@ create_kernel_for () {
   echo "### building kernel modules"
   mkdir -p $BUILD_RESULTS/$PI_VERSION/modules
   ARCH=arm CROSS_COMPILE=${CCPREFIX[${PI_VERSION}]} INSTALL_MOD_PATH=$BUILD_RESULTS/$PI_VERSION/modules make modules_install -j$NUM_CPUS
+
+  # remove symlinks, mustn't be part of raspberrypi-bootloader*.deb
+  echo "### removing symlinks"
+  rm -f $BUILD_RESULTS/$PI_VERSION/modules/lib/modules/*/build
+  rm -f $BUILD_RESULTS/$PI_VERSION/modules/lib/modules/*/source
+
   echo "### building deb packages"
   KBUILD_DEBARCH=armhf ARCH=arm CROSS_COMPILE=${CCPREFIX[${PI_VERSION}]} make deb-pkg
   mv ../*.deb $BUILD_RESULTS
