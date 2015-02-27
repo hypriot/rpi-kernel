@@ -66,7 +66,10 @@ function clone_or_update_repo_for () {
     cd $repo_path && git pull
   else
     echo "Cloning $repo_path with commit $repo_commit"
-    git clone --depth 1 $repo_commit $repo_url $repo_path
+    git clone --depth 1 $repo_url $repo_path
+    if [ ! [ -z "${repo_commit}" ] ]; then
+      git checkout -qf ${repo_commit}
+    fi
   fi
 }
 
