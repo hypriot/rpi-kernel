@@ -12,6 +12,8 @@ BUILD_ROOT=/var/kernel_build
 BUILD_CACHE=$BUILD_ROOT/cache
 ARM_TOOLS=$BUILD_CACHE/tools
 LINUX_KERNEL=$BUILD_CACHE/linux-kernel
+# LINUX_KERNEL_COMMIT=""
+LINUX_KERNEL_COMMIT=1f58c41a5aba262958c2869263e6fdcaa0aa3c00
 RASPBERRY_FIRMWARE=$BUILD_CACHE/rpi_firmware
 
 if [ -d /vagrant ]; then
@@ -55,27 +57,32 @@ function setup_build_dirs () {
 function clone_or_update_repo_for () {
   local repo_url=$1
   local repo_path=$2
+  local repo_commit=$3
 
+  if [ ! [ -z "${repo_commit}" ] ]; then
+    rm -rf $repo_path
+  fi
   if [ -d ${repo_path}/.git ]; then
     cd $repo_path && git pull
   else
-    git clone --depth 1 $repo_url $repo_path
+    echo "Cloning $repo_path with commit $repo_commit"
+    git clone --depth 1 $repo_commit $repo_url $repo_path
   fi
 }
 
 function setup_arm_cross_compiler_toolchain () {
   echo "### Check if Raspberry Pi Crosscompiler repository at ${ARM_TOOLS} is still up to date"
-  clone_or_update_repo_for 'https://github.com/raspberrypi/tools.git' $ARM_TOOLS
+  clone_or_update_repo_for 'https://github.com/raspberrypi/tools.git' $ARM_TOOLS ""
 }
 
 function setup_linux_kernel_sources () {
   echo "### Check if Raspberry Pi Linux Kernel repository at ${LINUX_KERNEL} is still up to date"
-  clone_or_update_repo_for 'https://github.com/raspberrypi/linux.git' $LINUX_KERNEL
+  clone_or_update_repo_for 'https://github.com/raspberrypi/linux.git' $LINUX_KERNEL $LINUX_KERNEL_COMMIT
 }
 
 function setup_rpi_firmware () {
   echo "### Check if Raspberry Pi Firmware repository at ${LINUX_KERNEL} is still up to date"
-  clone_or_update_repo_for 'https://github.com/asb/firmware' $RASPBERRY_FIRMWARE
+  clone_or_update_repo_for 'https://github.com/asb/firmware' $RASPBERRY_FIRMWARE ""
 }
 
 function prepare_kernel_building () {
