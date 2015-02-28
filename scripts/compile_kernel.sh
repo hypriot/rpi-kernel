@@ -158,7 +158,8 @@ function create_kernel_deb_packages () {
   create_dir_for_build_user $NEW_KERNEL
 
   # copy over source files for building the packages
-  cp -r $RASPBERRY_FIRMWARE/* $NEW_KERNEL
+  echo "copying firmware from $RASPBERRY_FIRMWARE to $NEW_KERNEL"
+  tar --exclude=modules -C $RASPBERRY_FIRMWARE -cf - . | tar -C $NEW_KERNEL -xvf -
   cp -r $SRC_DIR/debian $NEW_KERNEL/debian
   touch $NEW_KERNEL/debian/files
 
@@ -166,7 +167,6 @@ function create_kernel_deb_packages () {
     cp $BUILD_RESULTS/$pi_version/${IMAGE_NAME[${pi_version}]} $NEW_KERNEL/boot
     cp -R $BUILD_RESULTS/$pi_version/modules/lib/modules/*hypriotos* $NEW_KERNEL/modules
   done
-
   # build debian packages
   cd $NEW_KERNEL
 
