@@ -59,7 +59,7 @@ function clone_or_update_repo_for () {
   local repo_path=$2
   local repo_commit=$3
 
-  if [ ! [ -z "${repo_commit}" ] ]; then
+  if [ ! -z "${repo_commit}" ]; then
     rm -rf $repo_path
   fi
   if [ -d ${repo_path}/.git ]; then
@@ -67,7 +67,7 @@ function clone_or_update_repo_for () {
   else
     echo "Cloning $repo_path with commit $repo_commit"
     git clone --depth 1 $repo_url $repo_path
-    if [ ! [ -z "${repo_commit}" ] ]; then
+    if [ ! -z "${repo_commit}" ]; then
       git checkout -qf ${repo_commit}
     fi
   fi
