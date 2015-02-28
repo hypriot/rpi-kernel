@@ -159,7 +159,9 @@ function create_kernel_deb_packages () {
 
   # copy over source files for building the packages
   echo "copying firmware from $RASPBERRY_FIRMWARE to $NEW_KERNEL"
+  # skip modules directory from standard tree, because we will our on modules below
   tar --exclude=modules -C $RASPBERRY_FIRMWARE -cf - . | tar -C $NEW_KERNEL -xvf -
+  # create an empty modules directory, because we have skipped this above
   mkdir -p $NEW_KERNEL/modules/
   cp -r $SRC_DIR/debian $NEW_KERNEL/debian
   touch $NEW_KERNEL/debian/files
