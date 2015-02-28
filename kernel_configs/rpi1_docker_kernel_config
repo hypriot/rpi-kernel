@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm 3.18.7 Kernel Configuration
+# Linux/arm 3.18.8-hypriotos Kernel Configuration
 #
 CONFIG_ARM=y
 CONFIG_SYS_SUPPORTS_APM_EMULATION=y
@@ -3620,6 +3620,7 @@ CONFIG_LIRC_SERIAL_TRANSMITTER=y
 # CONFIG_LUSTRE_FS is not set
 # CONFIG_DGAP is not set
 # CONFIG_GS_FPGABOOT is not set
+# CONFIG_FB_TFT is not set
 
 #
 # SOC (System On Chip) specific Drivers

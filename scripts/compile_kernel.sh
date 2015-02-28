@@ -12,6 +12,8 @@ BUILD_ROOT=/var/kernel_build
 BUILD_CACHE=$BUILD_ROOT/cache
 ARM_TOOLS=$BUILD_CACHE/tools
 LINUX_KERNEL=$BUILD_CACHE/linux-kernel
+LINUX_KERNEL_COMMIT=""
+# LINUX_KERNEL_COMMIT=1f58c41a5aba262958c2869263e6fdcaa0aa3c00
 RASPBERRY_FIRMWARE=$BUILD_CACHE/rpi_firmware
 
 if [ -d /vagrant ]; then
@@ -55,27 +57,35 @@ function setup_build_dirs () {
 function clone_or_update_repo_for () {
   local repo_url=$1
   local repo_path=$2
+  local repo_commit=$3
 
+  if [ ! -z "${repo_commit}" ]; then
+    rm -rf $repo_path
+  fi
   if [ -d ${repo_path}/.git ]; then
     cd $repo_path && git pull
   else
+    echo "Cloning $repo_path with commit $repo_commit"
     git clone --depth 1 $repo_url $repo_path
+    if [ ! -z "${repo_commit}" ]; then
+      cd $repo_path && git checkout -qf ${repo_commit}
+    fi
   fi
 }
 
 function setup_arm_cross_compiler_toolchain () {
   echo "### Check if Raspberry Pi Crosscompiler repository at ${ARM_TOOLS} is still up to date"
-  clone_or_update_repo_for 'https://github.com/raspberrypi/tools.git' $ARM_TOOLS
+  clone_or_update_repo_for 'https://github.com/raspberrypi/tools.git' $ARM_TOOLS ""
 }
 
 function setup_linux_kernel_sources () {
   echo "### Check if Raspberry Pi Linux Kernel repository at ${LINUX_KERNEL} is still up to date"
-  clone_or_update_repo_for 'https://github.com/raspberrypi/linux.git' $LINUX_KERNEL
+  clone_or_update_repo_for 'https://github.com/raspberrypi/linux.git' $LINUX_KERNEL $LINUX_KERNEL_COMMIT
 }
 
 function setup_rpi_firmware () {
   echo "### Check if Raspberry Pi Firmware repository at ${LINUX_KERNEL} is still up to date"
-  clone_or_update_repo_for 'https://github.com/asb/firmware' $RASPBERRY_FIRMWARE
+  clone_or_update_repo_for 'https://github.com/asb/firmware' $RASPBERRY_FIRMWARE ""
 }
 
 function prepare_kernel_building () {
@@ -110,6 +120,13 @@ create_kernel_for () {
   echo "### building kernel"
   mkdir -p $BUILD_RESULTS/$PI_VERSION
   echo $KERNEL_COMMIT > $BUILD_RESULTS/kernel-commit.txt
+  if [ ! -z "${MENUCONFIG}" ]; then
+    echo "### starting menuconfig"
+    ARCH=arm CROSS_COMPILE=${CCPREFIX[$PI_VERSION]} make menuconfig
+    echo "### saving new config back to $LINUX_KERNEL_CONFIGS/${PI_VERSION}_docker_kernel_config"
+    cp $LINUX_KERNEL/.config $LINUX_KERNEL_CONFIGS/${PI_VERSION}_docker_kernel_config
+    return
+  fi
   ARCH=arm CROSS_COMPILE=${CCPREFIX[$PI_VERSION]} make -j$NUM_CPUS -k
   cp $LINUX_KERNEL/arch/arm/boot/Image $BUILD_RESULTS/$PI_VERSION/${IMAGE_NAME[${PI_VERSION}]}
 
@@ -141,7 +158,11 @@ function create_kernel_deb_packages () {
   create_dir_for_build_user $NEW_KERNEL
 
   # copy over source files for building the packages
-  cp -r $RASPBERRY_FIRMWARE/* $NEW_KERNEL
+  echo "copying firmware from $RASPBERRY_FIRMWARE to $NEW_KERNEL"
+  # skip modules directory from standard tree, because we will our on modules below
+  tar --exclude=modules -C $RASPBERRY_FIRMWARE -cf - . | tar -C $NEW_KERNEL -xvf -
+  # create an empty modules directory, because we have skipped this above
+  mkdir -p $NEW_KERNEL/modules/
   cp -r $SRC_DIR/debian $NEW_KERNEL/debian
   touch $NEW_KERNEL/debian/files
 
@@ -149,7 +170,6 @@ function create_kernel_deb_packages () {
     cp $BUILD_RESULTS/$pi_version/${IMAGE_NAME[${pi_version}]} $NEW_KERNEL/boot
     cp -R $BUILD_RESULTS/$pi_version/modules/lib/modules/* $NEW_KERNEL/modules
   done
-
   # build debian packages
   cd $NEW_KERNEL
 
