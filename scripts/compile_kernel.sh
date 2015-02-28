@@ -12,8 +12,8 @@ BUILD_ROOT=/var/kernel_build
 BUILD_CACHE=$BUILD_ROOT/cache
 ARM_TOOLS=$BUILD_CACHE/tools
 LINUX_KERNEL=$BUILD_CACHE/linux-kernel
-# LINUX_KERNEL_COMMIT=""
-LINUX_KERNEL_COMMIT=1f58c41a5aba262958c2869263e6fdcaa0aa3c00
+LINUX_KERNEL_COMMIT=""
+# LINUX_KERNEL_COMMIT=1f58c41a5aba262958c2869263e6fdcaa0aa3c00
 RASPBERRY_FIRMWARE=$BUILD_CACHE/rpi_firmware
 
 if [ -d /vagrant ]; then
@@ -68,7 +68,7 @@ function clone_or_update_repo_for () {
     echo "Cloning $repo_path with commit $repo_commit"
     git clone --depth 1 $repo_url $repo_path
     if [ ! -z "${repo_commit}" ]; then
-      git checkout -qf ${repo_commit}
+      cd $repo_path && git checkout -qf ${repo_commit}
     fi
   fi
 }
@@ -120,6 +120,13 @@ create_kernel_for () {
   echo "### building kernel"
   mkdir -p $BUILD_RESULTS/$PI_VERSION
   echo $KERNEL_COMMIT > $BUILD_RESULTS/kernel-commit.txt
+  if [ ! -z "${MENUCONFIG}" ]; then
+    echo "### starting menuconfig"
+    ARCH=arm CROSS_COMPILE=${CCPREFIX[$PI_VERSION]} make menuconfig
+    echo "### saving new config back to $LINUX_KERNEL_CONFIGS/${PI_VERSION}_docker_kernel_config"
+    cp $LINUX_KERNEL/.config $LINUX_KERNEL_CONFIGS/${PI_VERSION}_docker_kernel_config
+    return
+  fi
   ARCH=arm CROSS_COMPILE=${CCPREFIX[$PI_VERSION]} make -j$NUM_CPUS -k
   cp $LINUX_KERNEL/arch/arm/boot/Image $BUILD_RESULTS/$PI_VERSION/${IMAGE_NAME[${PI_VERSION}]}
 
