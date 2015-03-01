@@ -188,8 +188,8 @@ function create_kernel_deb_packages () {
 
 echo "*** all parameters are set ***"
 echo "*** the kernel timestamp is: $NEW_VERSION ***"
-echo "SRC_DIR: $SRC_DIR"
 echo "#############################################"
+
 
 # setup necessary build environment: dir, repos, etc.
 prepare_kernel_building
@@ -216,4 +216,6 @@ echo "### Copy deb packages to $FINAL_BUILD_RESULTS"
 mkdir -p $FINAL_BUILD_RESULTS
 cp $BUILD_RESULTS/*.deb $FINAL_BUILD_RESULTS
 cp $BUILD_RESULTS/*.txt $FINAL_BUILD_RESULTS
+
+ls -lh $FINAL_BUILD_RESULTS
 echo "*** kernel build done"
