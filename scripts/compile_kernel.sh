@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+set -x
 
 NUM_CPUS=`nproc`
 echo "###############"
