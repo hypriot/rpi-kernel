@@ -65,9 +65,8 @@ function clone_or_update_repo_for () {
   fi
   if [ -d ${repo_path}/.git ]; then
     cd $repo_path
-    git fetch --all
-    git reset --hard origin/master
-    # cd $repo_path && git pull
+    git reset --hard HEAD
+    git pull
   else
     echo "Cloning $repo_path with commit $repo_commit"
     git clone --depth 1 $repo_url $repo_path
