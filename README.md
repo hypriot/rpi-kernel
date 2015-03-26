@@ -17,22 +17,22 @@ These configuration files are created from an initial `make menuconfig` and acti
 
 ### Kernel deb packages
 
-The five kernel deb packages are copied to `build_results/kernel/<date-time>/`.
+The five kernel deb packages are copied to `build_results/kernel/${KERNEL_DATETIME}/`.
 
-* `libraspberrypi-bin_<date-time>_armhf.deb`
-* `libraspberrypi-dev_<date-time>_armhf.deb`
-* `libraspberrypi-doc_<date-time>_armhf.deb`
-* `libraspberrypi0_<date-time>_armhf.deb`
-* `raspberrypi-bootloader_<date-time>_armhf.deb`
+* `libraspberrypi-bin_${KERNEL_DATETIME}_armhf.deb`
+* `libraspberrypi-dev_${KERNEL_DATETIME}_armhf.deb`
+* `libraspberrypi-doc_${KERNEL_DATETIME}_armhf.deb`
+* `libraspberrypi0_${KERNEL_DATETIME}_armhf.deb`
+* `raspberrypi-bootloader_${KERNEL_DATETIME}_armhf.deb`
 * `kernel-commit.txt`
-* `linux-firmware-image-3.18.8+_3.18.8+-5_armel.deb`
-* `linux-firmware-image-3.18.8-v7+_3.18.8-v7+-6_armel.deb`
-* `linux-headers-3.18.8+_3.18.8+-5_armel.deb`
-* `linux-headers-3.18.8-v7+_3.18.8-v7+-6_armel.deb`
-* `linux-image-3.18.8+_3.18.8+-5_armel.deb`
-* `linux-image-3.18.8-v7+_3.18.8-v7+-6_armel.deb`
-* `linux-libc-dev_3.18.8+-5_armel.deb`
-* `linux-libc-dev_3.18.8-v7+-6_armel.deb`
+* `linux-firmware-image-${KERNEL_VERSION}+_${KERNEL_VERSION}+-5_armel.deb`
+* `linux-firmware-image-${KERNEL_VERSION}-v7+_${KERNEL_VERSION}-v7+-6_armel.deb`
+* `linux-headers-${KERNEL_VERSION}+_${KERNEL_VERSION}+-5_armel.deb`
+* `linux-headers-${KERNEL_VERSION}-v7+_${KERNEL_VERSION}-v7+-6_armel.deb`
+* `linux-image-${KERNEL_VERSION}+_${KERNEL_VERSION}+-5_armel.deb`
+* `linux-image-${KERNEL_VERSION}-v7+_${KERNEL_VERSION}-v7+-6_armel.deb`
+* `linux-libc-dev_${KERNEL_VERSION}+-5_armel.deb`
+* `linux-libc-dev_${KERNEL_VERSION}-v7+-6_armel.deb`
 
 ## Build with Vagrant
 
@@ -66,3 +66,21 @@ MENUCONFIG=1 /vagrant/scripts/compile_kernel.sh
 ```
 
 This will only call the `make menuconfig` inside the toolchain and copies the updated kernel configs back to `kernel_configs/` folder to be committed to the GitHub repo.
+
+## Test kernel
+
+To test the new kernel, copy all DEB packages to your Pi and login as root.
+Then install the following packages:
+
+```bash
+dpkg -i raspberrypi-bootloader_${KERNEL_DATETIME}_armhf.deb
+dpkg -i libraspberrypi0_${KERNEL_DATETIME}_armhf.deb
+dpkg -i libraspberrypi-dev_${KERNEL_DATETIME}_armhf.deb
+dpkg -i libraspberrypi-bin_${KERNEL_DATETIME}_armhf.deb
+dpkg -i libraspberrypi-doc_${KERNEL_DATETIME}_armhf.deb
+
+dpkg -i linux-headers-${KERNEL_VERSION}-hypriotos+_${KERNEL_VERSION}-hypriotos+-1_armhf.deb
+dpkg -i linux-headers-${KERNEL_VERSION}-hypriotos-v7+_${KERNEL_VERSION}-hypriotos-v7+-2_armhf.deb
+```
+
+Reboot your Pi.
