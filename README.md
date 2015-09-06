@@ -6,7 +6,7 @@ Build a Raspberry Pi 1 and 2 kernel with all kernel modules running docker.
 
 ### Kernel configs
 
-In the local directory `kernel_configs/` are two configuration files for Pi 1 nad Pi 2.
+In the local directory `kernel_configs/` are two configuration files for Pi 1 and Pi 2.
 
 * `rpi1_docker_kernel_config`
 * `rpi2_docker_kernel_config`
