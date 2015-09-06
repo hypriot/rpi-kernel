@@ -1,0 +1,23 @@
+image: registry.hypriot.com/hypriot/drone_builder_base
+git:
+  path: github.com/hypriot/rpi-kernel
+script:
+  - scripts/compile_kernel.sh
+publish:
+  s3:
+    acl: public-read
+    region: eu-central-1
+    bucket: buildserver-production
+    access_key: $$AWS_ACCESS_KEY_ID
+    secret_key: $$AWS_SECRET_ACCESS_KEY
+    source: output/
+    target: kernel/
+    recursive: true
+cache:
+  - /var/kernel_build/cache
+notify:
+  slack:
+    webhook_url: $$SLACK_WEBHOOK_URL
+    on_started: false
+    on_success: true
+    on_failure: true
