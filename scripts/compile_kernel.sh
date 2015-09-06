@@ -84,6 +84,8 @@ function setup_arm_cross_compiler_toolchain () {
 function setup_linux_kernel_sources () {
   echo "### Check if Raspberry Pi Linux Kernel repository at ${LINUX_KERNEL} is still up to date"
   clone_or_update_repo_for 'https://github.com/raspberrypi/linux.git' $LINUX_KERNEL $LINUX_KERNEL_COMMIT
+  echo "### Cleaning .version file for deb packages"
+  rm -f $LINUX_KERNEL/.version
 }
 
 function setup_rpi_firmware () {
