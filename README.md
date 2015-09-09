@@ -4,6 +4,16 @@ Build a Raspberry Pi 1 and 2 kernel with all kernel modules running docker.
 
 ## Build inputs
 
+### Kernel git commit
+
+In the build script `scripts/compile_kernel.sh` there is a git commit hash to pin the build to this exact commit to make it reproducable.
+
+If you want to build another kernel version, have a look at the upstream repo []() and check for a good git commit hash and change the line
+
+```bash
+LINUX_KERNEL_COMMIT="c8baa9702cc99de9614367d0b96de560944e7ccd"
+```
+
 ### Kernel configs
 
 In the local directory `kernel_configs/` are two configuration files for Pi 1 and Pi 2.
