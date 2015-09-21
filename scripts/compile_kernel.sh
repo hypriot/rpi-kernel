@@ -195,6 +195,8 @@ echo "*** all parameters are set ***"
 echo "*** the kernel timestamp is: $NEW_VERSION ***"
 echo "#############################################"
 
+# clear build cache to fetch the current raspberry/firmware
+rm -fr $RASPBERRY_FIRMWARE
 
 # setup necessary build environment: dir, repos, etc.
 prepare_kernel_building
