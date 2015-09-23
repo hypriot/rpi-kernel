@@ -90,7 +90,7 @@ function setup_linux_kernel_sources () {
 
 function setup_rpi_firmware () {
   echo "### Check if Raspberry Pi Firmware repository at ${LINUX_KERNEL} is still up to date"
-  clone_or_update_repo_for 'https://github.com/raspberrypi/firmware' $RASPBERRY_FIRMWARE ""
+  clone_or_update_repo_for 'https://github.com/RPi-Distro/firmware' $RASPBERRY_FIRMWARE ""
 }
 
 function prepare_kernel_building () {
