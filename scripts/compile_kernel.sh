@@ -13,7 +13,9 @@ BUILD_ROOT=/var/kernel_build
 BUILD_CACHE=$BUILD_ROOT/cache
 ARM_TOOLS=$BUILD_CACHE/tools
 LINUX_KERNEL=$BUILD_CACHE/linux-kernel
-LINUX_KERNEL_COMMIT="c8baa9702cc99de9614367d0b96de560944e7ccd"
+LINUX_KERNEL_COMMIT=
+# LINUX_KERNEL_COMMIT=36311a9ec4904c080bbdfcefc0f3d609ed508224 # Linux 4.1.8
+# LINUX_KERNEL_COMMIT="59e76bb7e2936acd74938bb385f0884e34b91d72"
 # LINUX_KERNEL_COMMIT=1f58c41a5aba262958c2869263e6fdcaa0aa3c00
 RASPBERRY_FIRMWARE=$BUILD_CACHE/rpi_firmware
 
@@ -90,7 +92,7 @@ function setup_linux_kernel_sources () {
 
 function setup_rpi_firmware () {
   echo "### Check if Raspberry Pi Firmware repository at ${LINUX_KERNEL} is still up to date"
-  clone_or_update_repo_for 'https://github.com/asb/firmware' $RASPBERRY_FIRMWARE ""
+  clone_or_update_repo_for 'https://github.com/RPi-Distro/firmware' $RASPBERRY_FIRMWARE ""
 }
 
 function prepare_kernel_building () {
@@ -195,6 +197,8 @@ echo "*** all parameters are set ***"
 echo "*** the kernel timestamp is: $NEW_VERSION ***"
 echo "#############################################"
 
+# clear build cache to fetch the current raspberry/firmware
+sudo rm -fr $RASPBERRY_FIRMWARE
 
 # setup necessary build environment: dir, repos, etc.
 prepare_kernel_building
