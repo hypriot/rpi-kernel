@@ -135,7 +135,7 @@ create_kernel_for () {
     return
   fi
   ARCH=arm CROSS_COMPILE=${CCPREFIX[$PI_VERSION]} make -j$NUM_CPUS -k
-  cp $LINUX_KERNEL/arch/arm/boot/Image $BUILD_RESULTS/$PI_VERSION/${IMAGE_NAME[${PI_VERSION}]}
+  ${ARM_TOOLS}/mkimage/mkknlimg $LINUX_KERNEL/arch/arm/boot/Image $BUILD_RESULTS/$PI_VERSION/${IMAGE_NAME[${PI_VERSION}]}
 
   echo "### building kernel modules"
   mkdir -p $BUILD_RESULTS/$PI_VERSION/modules
