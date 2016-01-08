@@ -1,0 +1,11 @@
+language: bash
+script:
+  - scripts/prepare_build_environment.sh
+  - scripts/compile_kernel.sh
+deploy:
+  provider: packagecloud
+  repository: hypriot/rpi-kernel
+  username: info@hypriot.com
+  token:
+    secure: YNc3R9PPftdpFPVi0cEkHoeA3EhLqDKSxqGfrFmn6VAJ3LzB0N93RvrkwZvXVR4HUeORSEXd/Afzbz4Zw4WVYDGgoDO+IrhzDHaZyX/hwryLJJBOGa7QOIEa1UnObAJb4YzCmstkVobercF5smpcUNo0Z5C6CWLn9YcrrjRSA3u/8jhadNqKL8jQ5vR6ebLj7tVfG4EDOSDkN/hin9v1ORIQoez5BCd8Im0pfckh9CAiGaptTLJO9vYfDfApb+mFH1SHXNUbFdjlEoQsEeAHQsLai/3VdVZKgfk/UQwsUeUVnUm3ELRh5aHJIubK3OUophkAgnbxMIBq/73lRtiJCbm5STjv0mEupOK3Kt1UcSTN7xeIRMDNE2JNdTMg6ksQ8puCeP1V2U+u0rSnHrnoasNRjcpWpc1fN69ZNoXqQtD+oCg0l7bGB7DpnkLskVWfLuU9clgi+w9O6GOrBsCdB/Xm7Bj5RcUR/Co9fZQrwF9FqDk+b3Xva2ZAzOYL9l7x5VvxYVkEFAwQdNKTxIvdaAlLujfFpW7MHocpwdzauPxf9Z1DzSJeiRP/RBeiPY2YGn4kXKi9P9jqTky2RVbCzeeZUZql7lqb2WAtLq550z7VeEvBZpAG29sGQLnpMoYVwo4y2I4G5/vaJgd4n8fMNxCzFIhTx5dwHxaLCzaZdhM=
+  dist: debian/jessie
