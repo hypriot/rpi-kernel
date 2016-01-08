@@ -1,3 +1,4 @@
+sudo: required
 language: bash
 script:
   - scripts/prepare_build_environment.sh
