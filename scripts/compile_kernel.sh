@@ -107,11 +107,11 @@ function setup_linux_kernel_sources () {
 	cp -f patch-4.1.13-rt14.patch $LINUX_KERNEL/patchRT.patch
 	cd $LINUX_KERNEL
 	patch -f -p1 < patchRT.patch
+	cd -
      fi
   fi
   echo "### Cleaning .version file for deb packages"
   rm -f $LINUX_KERNEL/.version
-  cd -
 }
 
 function setup_rpi_firmware () {
