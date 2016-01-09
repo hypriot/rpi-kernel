@@ -98,7 +98,6 @@ function setup_linux_kernel_sources () {
   # Parches RT patches
   if [ ! -z $RT ]; then
      if [ ! -f $LINUX_KERNEL/patch-4.1.13-rt14.patch ]; then
-#    echo "File not found!"
 
 	wget https://www.kernel.org/pub/linux/kernel/projects/rt/4.1/older/patch-4.1.13-rt14.patch.gz
 	# wget https://www.kernel.org/pub/linux/kernel/projects/rt/4.1/patch-4.1.15-rt17.patch.gz

@@ -94,3 +94,9 @@ dpkg -i linux-headers-${KERNEL_VERSION}-hypriotos-v7+_${KERNEL_VERSION}-hyprioto
 ```
 
 Reboot your Pi.
+
+## Real Time Kernel
+
+For a Real Time Kernel the only different thing it has to be made is:
+RT=1 source scripts/compile\_kernel.sh
+
