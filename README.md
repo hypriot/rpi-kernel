@@ -29,6 +29,8 @@ These configuration files are created from an initial `make menuconfig` and acti
 For a Real Time Kernel the only different thing it has to be made is:
 RT=1 source scripts/compile\_kernel.sh
 
+There are some *unstabilities* under heavy load, so be careful...
+
 ## Build outputs
 
 ### Kernel deb packages
