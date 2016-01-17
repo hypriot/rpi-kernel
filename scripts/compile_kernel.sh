@@ -92,36 +92,20 @@ function setup_arm_cross_compiler_toolchain () {
   clone_or_update_repo_for 'https://github.com/raspberrypi/tools.git' $ARM_TOOLS ""
 }
 
+
 function setup_linux_kernel_sources () {
   echo "### Check if Raspberry Pi Linux Kernel repository at ${LINUX_KERNEL} is still up to date"
   clone_or_update_repo_for 'https://github.com/raspberrypi/linux.git' $LINUX_KERNEL $LINUX_KERNEL_COMMIT
   # Parches RT patches
   if [ ! -z $RT ]; then
      if [ ! -f $LINUX_KERNEL/patch-4.1.13-rt14.patch ]; then
-<<<<<<< HEAD
-
-	wget https://www.kernel.org/pub/linux/kernel/projects/rt/4.1/older/patch-4.1.13-rt14.patch.gz
-	# wget https://www.kernel.org/pub/linux/kernel/projects/rt/4.1/patch-4.1.15-rt17.patch.gz
-	# wget https://www.kernel.org/pub/linux/kernel/projects/rt/4.1/patches-4.1.13-rt15.tar.gz
-	gunzip patch-4.1.13-rt14.patch.gz
-	cp -f patch-4.1.13-rt14.patch $LINUX_KERNEL/patchRT.patch
-	cd $LINUX_KERNEL
-	patch -f -p1 < patchRT.patch
-	cd -
+        wget https://www.kernel.org/pub/linux/kernel/projects/rt/4.1/older/patch-4.1.13-rt14.patch.gz
+        gunzip patch-4.1.13-rt14.patch.gz
+        cp -f patch-4.1.13-rt14.patch $LINUX_KERNEL/patchRT.patch
+        cd $LINUX_KERNEL
+        patch -f -p1 < patchRT.patch
+        cd -
      fi
-=======
-#    echo "File not found!"
-    
-    	wget https://www.kernel.org/pub/linux/kernel/projects/rt/4.1/older/patch-4.1.13-rt14.patch.gz
-    	# wget https://www.kernel.org/pub/linux/kernel/projects/rt/4.1/patch-4.1.15-rt17.patch.gz
-    	# wget https://www.kernel.org/pub/linux/kernel/projects/rt/4.1/patches-4.1.13-rt15.tar.gz
-    	gunzip patch-4.1.13-rt14.patch.gz
-    	cp -f patch-4.1.13-rt14.patch $LINUX_KERNEL/patchRT.patch
-    	cd $LINUX_KERNEL
-    	patch -f -p1 < patchRT.patch
-      cd -
-    fi
->>>>>>> c881d0325d8061df7ff21938cd46580ad77bb791
   fi
   echo "### Cleaning .version file for deb packages"
   rm -f $LINUX_KERNEL/.version
