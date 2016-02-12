@@ -3,6 +3,9 @@ language: bash
 script:
   - scripts/prepare_build_environment.sh
   - scripts/compile_kernel.sh
+branches:
+  only:
+    - master
 deploy:
   provider: packagecloud
   repository: hypriot/rpi-kernel
