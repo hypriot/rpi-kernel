@@ -6,6 +6,7 @@ script:
 branches:
   only:
     - master
+    - /^v\d.*$/
 deploy:
   provider: packagecloud
   repository: hypriot/rpi-kernel
