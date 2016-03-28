@@ -9,8 +9,12 @@ branches:
     - /^v\d.*$/
 deploy:
   provider: packagecloud
-  repository: hypriot/rpi-kernel
-  username: info@hypriot.com
+  repository: rpi
+  username: hypriot-uploader
+  skip_cleanup: true
   token:
-    secure: YNc3R9PPftdpFPVi0cEkHoeA3EhLqDKSxqGfrFmn6VAJ3LzB0N93RvrkwZvXVR4HUeORSEXd/Afzbz4Zw4WVYDGgoDO+IrhzDHaZyX/hwryLJJBOGa7QOIEa1UnObAJb4YzCmstkVobercF5smpcUNo0Z5C6CWLn9YcrrjRSA3u/8jhadNqKL8jQ5vR6ebLj7tVfG4EDOSDkN/hin9v1ORIQoez5BCd8Im0pfckh9CAiGaptTLJO9vYfDfApb+mFH1SHXNUbFdjlEoQsEeAHQsLai/3VdVZKgfk/UQwsUeUVnUm3ELRh5aHJIubK3OUophkAgnbxMIBq/73lRtiJCbm5STjv0mEupOK3Kt1UcSTN7xeIRMDNE2JNdTMg6ksQ8puCeP1V2U+u0rSnHrnoasNRjcpWpc1fN69ZNoXqQtD+oCg0l7bGB7DpnkLskVWfLuU9clgi+w9O6GOrBsCdB/Xm7Bj5RcUR/Co9fZQrwF9FqDk+b3Xva2ZAzOYL9l7x5VvxYVkEFAwQdNKTxIvdaAlLujfFpW7MHocpwdzauPxf9Z1DzSJeiRP/RBeiPY2YGn4kXKi9P9jqTky2RVbCzeeZUZql7lqb2WAtLq550z7VeEvBZpAG29sGQLnpMoYVwo4y2I4G5/vaJgd4n8fMNxCzFIhTx5dwHxaLCzaZdhM=
+    secure: "ncOWi0UHwqrFB3nO6MCl8qoZvu0rFZcqwP9cKcsL2u5x9P+dUySw6MZKq+/iFiJ4AMAgQBjMQXgEwN7AP/0LxkpYs3lVnkvTX/kmlZhHq9jYEoT1UboZCRVN+17jQDb2wj4cTCiS6u+zARTnh5f32VqcRXyhRwZmbxxwBT6lfh6idOGPkZVuY8Sdf0GUdA5iJMSNVIFKMifs5mIUX3CkhsUi1KNzuQ2E9dLSvUhtZ/fjOV7jEhwJnyyxNZIqt0fSk/vzvDSmLTcU3/6W+6TDWZ1Ug+uamDKjNRR6SEGhjCVu137JvHzaFnSeTlkDwQ+qLUZf7h0mRuc+cr7JkS84cG0Hf7fV3PUYtCGoPoLX1ogGzBpyQO5VaLKkNaKNhDS7cVlr8HlXPIYFzwe/tCBOTrClg62jE34HtvRcJ2zr4qc7QIqyI4o3S+XLU0Ll8aBLl+zOee/JkGea5wHYw0JbO0+ZKkQJtXgSUwWUV77UB/yKHSr9M/dZlvt9B75KSnqct3bxsKzy4VFmGY6iv41puAFfPH3+JD7ePpOSaz2v3Qt3rD8i+DoLanjGAV5H3TcleS9EfsWqe0sB9iIZWnrLtTZ9mMR6zJBmlk0wFEJNJw+akPBB7bhOUzzMTfW3Y9MHyRkohtBa45sjJ+Xp4Gkbn4ttFeBOHdtpz374MUWi/hY="
   dist: debian/jessie
+  on:
+    tags: true
+    repo: hypriot/rpi-kernel
