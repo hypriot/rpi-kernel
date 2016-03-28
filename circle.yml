@@ -1,0 +1,4 @@
+test:
+  override:
+    - scripts/prepare_build_environment.sh
+    - scripts/compile_kernel.sh
