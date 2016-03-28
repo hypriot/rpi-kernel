@@ -183,6 +183,9 @@ function create_kernel_deb_packages () {
   dch -v ${NEW_VERSION} --package raspberrypi-firmware 'add Hypriot custom kernel'
   debuild --no-lintian -ePATH=${PATH}:$ARM_TOOLS/$X64_CROSS_COMPILE_CHAIN/bin -b -aarmhf -us -uc
   cp ../*.deb $BUILD_RESULTS
+  if [[ ! -z $CIRCLE_ARTIFACTS ]]; then
+    cp ../*.deb $CIRCLE_ARTIFACTS
+  fi
 
   echo "###############"
   echo "### FINISH building kernel DEBIAN PACKAGES"
