@@ -38,13 +38,11 @@ X64_CROSS_COMPILE_CHAIN=arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64
 
 declare -A CCPREFIX
 CCPREFIX["rpi1"]=$ARM_TOOLS/$X64_CROSS_COMPILE_CHAIN/bin/arm-linux-gnueabihf-
-CCPREFIX["rpi2"]=$ARM_TOOLS/$X64_CROSS_COMPILE_CHAIN/bin/arm-linux-gnueabihf-
-CCPREFIX["rpi3"]=$ARM_TOOLS/$X64_CROSS_COMPILE_CHAIN/bin/arm-linux-gnueabihf-
+CCPREFIX["rpi2_3"]=$ARM_TOOLS/$X64_CROSS_COMPILE_CHAIN/bin/arm-linux-gnueabihf-
 
 declare -A IMAGE_NAME
 IMAGE_NAME["rpi1"]=kernel.img
-IMAGE_NAME["rpi2"]=kernel7.img
-IMAGE_NAME["rpi3"]=kernel7.img
+IMAGE_NAME["rpi2_3"]=kernel7.img
 
 function create_dir_for_build_user () {
     local target_dir=$1
