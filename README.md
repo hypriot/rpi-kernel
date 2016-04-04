@@ -1,4 +1,4 @@
-# rpi-kernel [![Build Status](https://travis-ci.org/hypriot/rpi-kernel.svg?branch=master)](https://travis-ci.org/hypriot/rpi-kernel)
+# rpi-kernel [![Circle CI](https://circleci.com/gh/hypriot/rpi-kernel.svg?style=svg)](https://circleci.com/gh/hypriot/rpi-kernel)
 
 Build a Raspberry Pi 1 and 2 kernel with all kernel modules running docker.
 
