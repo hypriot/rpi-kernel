@@ -19,6 +19,15 @@ LINUX_KERNEL_COMMIT=
 # LINUX_KERNEL_COMMIT=1f58c41a5aba262958c2869263e6fdcaa0aa3c00
 RASPBERRY_FIRMWARE=$BUILD_CACHE/rpi_firmware
 
+if [ ! -z $RT ]; then
+    VERSUFRT="-RT"
+    KERNSUFRT="-rt"
+    LINUX_KERNEL_COMMIT=02a8ee530e32b08e5df44f10e24d5fd82bb960e3 
+
+    echo "###############################"
+    echo "### For ${VERSUFRT}"
+fi
+
 if [ -d /vagrant ]; then
   # running in vagrant VM
   SRC_DIR=/vagrant
@@ -31,7 +40,7 @@ fi
 
 LINUX_KERNEL_CONFIGS=$SRC_DIR/kernel_configs
 
-NEW_VERSION=`date +%Y%m%d-%H%M%S`
+NEW_VERSION=`date +%Y%m%d-%H%M%S`$VERSUFRT
 BUILD_RESULTS=$BUILD_ROOT/results/kernel-$NEW_VERSION
 
 X64_CROSS_COMPILE_CHAIN=arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64
@@ -83,9 +92,21 @@ function setup_arm_cross_compiler_toolchain () {
   clone_or_update_repo_for 'https://github.com/raspberrypi/tools.git' $ARM_TOOLS ""
 }
 
+
 function setup_linux_kernel_sources () {
   echo "### Check if Raspberry Pi Linux Kernel repository at ${LINUX_KERNEL} is still up to date"
   clone_or_update_repo_for 'https://github.com/raspberrypi/linux.git' $LINUX_KERNEL $LINUX_KERNEL_COMMIT
+  # Parches RT patches
+  if [ ! -z $RT ]; then
+     if [ ! -f $LINUX_KERNEL/patch-4.1.13-rt14.patch ]; then
+        wget https://www.kernel.org/pub/linux/kernel/projects/rt/4.1/older/patch-4.1.13-rt14.patch.gz
+        gunzip patch-4.1.13-rt14.patch.gz
+        cp -f patch-4.1.13-rt14.patch $LINUX_KERNEL/patchRT.patch
+        cd $LINUX_KERNEL
+        patch -f -p1 < patchRT.patch
+        cd -
+     fi
+  fi
   echo "### Cleaning .version file for deb packages"
   rm -f $LINUX_KERNEL/.version
 }
@@ -104,15 +125,17 @@ function prepare_kernel_building () {
 
 
 create_kernel_for () {
-  echo "###############"
-  echo "### START building kernel for ${PI_VERSION}"
 
   local PI_VERSION=$1
+
+  echo "###############"
+
+  echo "### START building kernel for ${PI_VERSION}"
 
   cd $LINUX_KERNEL
 
   # add kernel branding for hyprOS
-  sed -i 's/^EXTRAVERSION =.*/EXTRAVERSION = -hypriotos/g' Makefile
+  sed -i 's/^EXTRAVERSION =.*/EXTRAVERSION = -hypriotos'$KERNSUFRT'/g' Makefile
 
   # save git commit id of this build
   local KERNEL_COMMIT=`git rev-parse HEAD`
@@ -122,19 +145,20 @@ create_kernel_for () {
   make ARCH=arm clean
 
   # copy kernel configuration file over
-  cp $LINUX_KERNEL_CONFIGS/${PI_VERSION}_docker_kernel_config $LINUX_KERNEL/.config
+  cp $LINUX_KERNEL_CONFIGS/${PI_VERSION}_docker_kernel_config$VERSUFRT $LINUX_KERNEL/.config
 
   echo "### building kernel"
+
   mkdir -p $BUILD_RESULTS/$PI_VERSION
   echo $KERNEL_COMMIT > $BUILD_RESULTS/kernel-commit.txt
   if [ ! -z "${MENUCONFIG}" ]; then
     echo "### starting menuconfig"
     ARCH=arm CROSS_COMPILE=${CCPREFIX[$PI_VERSION]} make menuconfig
     echo "### saving new config back to $LINUX_KERNEL_CONFIGS/${PI_VERSION}_docker_kernel_config"
-    cp $LINUX_KERNEL/.config $LINUX_KERNEL_CONFIGS/${PI_VERSION}_docker_kernel_config
+    cp $LINUX_KERNEL/.config $LINUX_KERNEL_CONFIGS/${PI_VERSION}_docker_kernel_config$VERSUFRT
     return
   fi
-  ARCH=arm CROSS_COMPILE=${CCPREFIX[$PI_VERSION]} make -j$NUM_CPUS -k
+  ARCH=arm CROSS_COMPILE=${CCPREFIX[$PI_VERSION]} make -j$NUM_CPUS # -k
   ${ARM_TOOLS}/mkimage/mkknlimg $LINUX_KERNEL/arch/arm/boot/Image $BUILD_RESULTS/$PI_VERSION/${IMAGE_NAME[${PI_VERSION}]}
 
   echo "### building kernel modules"

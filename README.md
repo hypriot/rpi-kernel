@@ -23,6 +23,14 @@ In the local directory `kernel_configs/` are two configuration files for Pi 1 an
 
 These configuration files are created from an initial `make menuconfig` and activating all kernel modules we need to run docker on the Raspberry Pi.
 
+
+## Real Time Kernel
+
+For a Real Time Kernel the only different thing it has to be made is:
+RT=1 source scripts/compile\_kernel.sh
+
+There are some *unstabilities* under heavy load, so be careful...
+
 ## Build outputs
 
 ### Kernel deb packages
@@ -94,3 +102,43 @@ dpkg -i linux-headers-${KERNEL_VERSION}-hypriotos-v7+_${KERNEL_VERSION}-hyprioto
 ```
 
 Reboot your Pi.
+
+```bash
+$ uname -a
+Linux black-pearl 4.1.15-hypriotos-rt-rt14-v7+ #2 SMP PREEMPT RT Sat Jan 9 21:09:05 CET 2016 armv7l GNU/Linux
+```
+Taken from emlid.com and http://kb.digium.com/articles/Configuration/How-to-perform-a-system-latency-test
+
+In the first SSH or console session, run: sudo sudo ./cyclictest -l10000000 -m -n -a0 -t1 -p99 -i400 -h400 -q
+sudo ./cyclictest -l100000 -m -n -a0 -t1 -p99 -i400 -h400 -q
+
+```bash
+# /dev/cpu_dma_latency set to 0us
+# Histogram
+000013 000000
+000014 000004
+000015 249277
+000016 8595933
+000017 935863
+000018 088623
+000019 021123
+000020 006084
+000021 004336
+000022 003522
+000023 003186
+000024 003169
+000025 003166
+
+# Total: 010000000
+# Min Latencies: 00014
+# Avg Latencies: 00016
+# Max Latencies: 00076
+# Histogram Overflows: 00000
+# Histogram Overflow at cycle number:
+# Thread 0:
+
+
+```
+In the second SSH or console session, run: sudo hdparm -t /dev/mmcblk0p1
+/dev/mmcblk0p1:
+ Timing buffered disk reads:  56 MB in  3.09 seconds =  18.14 MB/sec
