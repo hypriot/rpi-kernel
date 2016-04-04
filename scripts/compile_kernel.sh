@@ -148,6 +148,9 @@ create_kernel_for () {
 
   echo "### building deb packages"
   KBUILD_DEBARCH=armhf ARCH=arm CROSS_COMPILE=${CCPREFIX[${PI_VERSION}]} make deb-pkg
+  if [[ ! -z $CIRCLE_ARTIFACTS ]]; then
+    cp ../*.deb $CIRCLE_ARTIFACTS
+  fi
   mv ../*.deb $BUILD_RESULTS
   echo "###############"
   echo "### END building kernel for ${PI_VERSION}"
