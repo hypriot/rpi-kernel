@@ -134,10 +134,13 @@ create_kernel_for () {
     cp $LINUX_KERNEL/.config $LINUX_KERNEL_CONFIGS/${PI_VERSION}_docker_kernel_config
     return
   fi
-  ARCH=arm CROSS_COMPILE=${CCPREFIX[$PI_VERSION]} make -j$NUM_CPUS -k
+
+  echo "### building kernel and deb packages"
+  KBUILD_DEBARCH=armhf ARCH=arm CROSS_COMPILE=${CCPREFIX[${PI_VERSION}]} make deb-pkg -j$NUM_CPUS
+
   ${ARM_TOOLS}/mkimage/mkknlimg $LINUX_KERNEL/arch/arm/boot/Image $BUILD_RESULTS/$PI_VERSION/${IMAGE_NAME[${PI_VERSION}]}
 
-  echo "### building kernel modules"
+  echo "### installing kernel modules"
   mkdir -p $BUILD_RESULTS/$PI_VERSION/modules
   ARCH=arm CROSS_COMPILE=${CCPREFIX[${PI_VERSION}]} INSTALL_MOD_PATH=$BUILD_RESULTS/$PI_VERSION/modules make modules_install -j$NUM_CPUS
 
@@ -146,8 +149,6 @@ create_kernel_for () {
   rm -f $BUILD_RESULTS/$PI_VERSION/modules/lib/modules/*/build
   rm -f $BUILD_RESULTS/$PI_VERSION/modules/lib/modules/*/source
 
-  echo "### building deb packages"
-  KBUILD_DEBARCH=armhf ARCH=arm CROSS_COMPILE=${CCPREFIX[${PI_VERSION}]} make deb-pkg
   if [[ ! -z $CIRCLE_ARTIFACTS ]]; then
     cp ../*.deb $CIRCLE_ARTIFACTS
   fi
