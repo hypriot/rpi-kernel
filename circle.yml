@@ -4,7 +4,9 @@ test:
     - scripts/compile_kernel.sh
 
 dependencies:
-  cache_directories:
+ pre:
+     - gem install package_cloud
+ cache_directories:
     - "/var/kernel_build/cache"
 
 deployment:
