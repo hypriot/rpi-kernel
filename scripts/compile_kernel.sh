@@ -13,7 +13,8 @@ BUILD_ROOT=/var/kernel_build
 BUILD_CACHE=$BUILD_ROOT/cache
 ARM_TOOLS=$BUILD_CACHE/tools
 LINUX_KERNEL=$BUILD_CACHE/linux-kernel
-LINUX_KERNEL_COMMIT=52261e73a34f9ed7f1d049902842895a2c433a50 # Linux 4.4.10
+LINUX_KERNEL_COMMIT=4eda74f2dfcc8875482575c79471bde6766de3ad # Linux 4.4.15
+# LINUX_KERNEL_COMMIT=52261e73a34f9ed7f1d049902842895a2c433a50 # Linux 4.4.10
 # LINUX_KERNEL_COMMIT=36311a9ec4904c080bbdfcefc0f3d609ed508224 # Linux 4.1.8
 # LINUX_KERNEL_COMMIT="59e76bb7e2936acd74938bb385f0884e34b91d72"
 # LINUX_KERNEL_COMMIT=1f58c41a5aba262958c2869263e6fdcaa0aa3c00
@@ -71,7 +72,7 @@ function clone_or_update_repo_for () {
     git pull
   else
     echo "Cloning $repo_path with commit $repo_commit"
-    git clone --depth 200 $repo_url $repo_path
+    git clone --depth 20 $repo_url $repo_path
     if [ ! -z "${repo_commit}" ]; then
       cd $repo_path && git checkout -qf ${repo_commit}
     fi
@@ -111,7 +112,7 @@ create_kernel_for () {
 
   cd $LINUX_KERNEL
 
-  # add kernel branding for hyprOS
+  # add kernel branding for HypriotOS
   sed -i 's/^EXTRAVERSION =.*/EXTRAVERSION = -hypriotos/g' Makefile
 
   # save git commit id of this build
