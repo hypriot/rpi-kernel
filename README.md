@@ -83,6 +83,7 @@ To test the new kernel, copy all DEB packages to your Pi and login as root.
 Then install the following packages:
 
 ```bash
+dpkg -i raspberrypi-kernel_${KERNEL_DATETIME}_armhf.deb
 dpkg -i raspberrypi-bootloader_${KERNEL_DATETIME}_armhf.deb
 dpkg -i libraspberrypi0_${KERNEL_DATETIME}_armhf.deb
 dpkg -i libraspberrypi-dev_${KERNEL_DATETIME}_armhf.deb
