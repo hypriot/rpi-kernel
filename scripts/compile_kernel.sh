@@ -13,7 +13,8 @@ BUILD_ROOT=/var/kernel_build
 BUILD_CACHE=$BUILD_ROOT/cache
 ARM_TOOLS=$BUILD_CACHE/tools
 LINUX_KERNEL=$BUILD_CACHE/linux-kernel
-LINUX_KERNEL_COMMIT=1ebe8d4a4c96cd6a90805c74233a468854960f67 # Linux 4.4.43
+LINUX_KERNEL_COMMIT=04c8e47067d4873c584395e5cb260b4f170a99ea # Linux 4.4.50
+# LINUX_KERNEL_COMMIT=1ebe8d4a4c96cd6a90805c74233a468854960f67 # Linux 4.4.43
 # LINUX_KERNEL_COMMIT=5e46914b3417fe9ff42546dcacd0f41f9a0fb172 # Linux 4.4.39
 # LINUX_KERNEL_COMMIT=1c8b82bcb72f95d8f9d606326178192a2abc9c9c # Linux 4.4.27
 # LINUX_KERNEL_COMMIT=e14824ba0cc70de7cbb7b34c28a00cf755ceb0dc # Linux 4.4.24
@@ -76,7 +77,7 @@ function clone_or_update_repo_for () {
     git pull
   else
     echo "Cloning $repo_path with commit $repo_commit"
-    git clone --depth 20 $repo_url $repo_path
+    git clone $repo_url $repo_path
     if [ ! -z "${repo_commit}" ]; then
       cd $repo_path && git checkout -qf ${repo_commit}
     fi
