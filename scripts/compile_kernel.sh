@@ -72,9 +72,10 @@ function clone_or_update_repo_for () {
     rm -rf $repo_path
   fi
   if [ -d ${repo_path}/.git ]; then
-    cd $repo_path
+    pushd $repo_path
     git reset --hard HEAD
     git pull
+    popd
   else
     echo "Cloning $repo_path with commit $repo_commit"
     git clone $repo_url $repo_path
@@ -128,7 +129,7 @@ create_kernel_for () {
   make ARCH=arm clean
 
   # copy kernel configuration file over
-  cp $LINUX_KERNEL_CONFIGS/${PI_VERSION}_docker_kernel_config $LINUX_KERNEL/.config
+  cp $LINUX_KERNEL_CONFIGS/${PI_VERSION}_docker_defconfig $LINUX_KERNEL/arch/arm/configs/
 
   echo "### building kernel"
   mkdir -p $BUILD_RESULTS/$PI_VERSION
@@ -138,11 +139,13 @@ create_kernel_for () {
     ARCH=arm CROSS_COMPILE=${CCPREFIX[$PI_VERSION]} make menuconfig
     echo "### saving new config back to $LINUX_KERNEL_CONFIGS/${PI_VERSION}_docker_kernel_config"
     cp $LINUX_KERNEL/.config $LINUX_KERNEL_CONFIGS/${PI_VERSION}_docker_kernel_config
+    ARCH=arm CROSS_COMPILE=${CCPREFIX[$PI_VERSION]} make savedefconfig
+    cp $LINUX_KERNEL/defconfig $LINUX_KERNEL_CONFIGS/${PI_VERSION}_docker_defconfig
     return
   fi
 
   echo "### building kernel and deb packages"
-  KBUILD_DEBARCH=armhf ARCH=arm CROSS_COMPILE=${CCPREFIX[${PI_VERSION}]} make deb-pkg -j$NUM_CPUS
+  KBUILD_DEBARCH=armhf ARCH=arm CROSS_COMPILE=${CCPREFIX[${PI_VERSION}]} make ${PI_VERSION}_docker_defconfig deb-pkg -j$NUM_CPUS
 
   ${LINUX_KERNEL}/scripts/mkknlimg --ddtk $LINUX_KERNEL/arch/arm/boot/Image $BUILD_RESULTS/$PI_VERSION/${IMAGE_NAME[${PI_VERSION}]}
 
@@ -174,7 +177,7 @@ function create_kernel_deb_packages () {
   # copy over source files for building the packages
   echo "copying firmware from $RASPBERRY_FIRMWARE to $NEW_KERNEL"
   # skip modules directory from standard tree, because we will our on modules below
-  tar --exclude=modules -C $RASPBERRY_FIRMWARE -cf - . | tar -C $NEW_KERNEL -xvf -
+  tar --exclude=modules --exclude=.git -C $RASPBERRY_FIRMWARE -cf - . | tar -C $NEW_KERNEL -xvf -
   # create an empty modules directory, because we have skipped this above
   mkdir -p $NEW_KERNEL/modules/
   cp -r $SRC_DIR/debian $NEW_KERNEL/debian
@@ -208,7 +211,7 @@ echo "*** the kernel timestamp is: $NEW_VERSION ***"
 echo "#############################################"
 
 # clear build cache to fetch the current raspberry/firmware
-sudo rm -fr $RASPBERRY_FIRMWARE
+sudo rm -rf $RASPBERRY_FIRMWARE
 
 # setup necessary build environment: dir, repos, etc.
 prepare_kernel_building
