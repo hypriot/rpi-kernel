@@ -14,7 +14,7 @@ jobs:
           command: scripts/compile_kernel.sh
 
       - store_artifacts:
-          path: /var/kernel_build/results
+          path: output
 
       - deploy:
           name: Deploy

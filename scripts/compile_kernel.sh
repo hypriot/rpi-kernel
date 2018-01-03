@@ -29,7 +29,7 @@ if [ -d /vagrant ]; then
   # running in vagrant VM
   SRC_DIR=/vagrant
 else
-  # running in drone build
+  # running in Circle build
   SRC_DIR=`pwd`
   BUILD_USER=`id -u -n`
   BUILD_GROUP=`id -g -n`
@@ -226,7 +226,7 @@ if [ -d /vagrant ]; then
   # copy build results to synced vagrant host folder
   FINAL_BUILD_RESULTS=/vagrant/build_results/$NEW_VERSION
 else
-  # running in drone build
+  # running in Circle build
   FINAL_BUILD_RESULTS=$SRC_DIR/output/$NEW_VERSION
 fi
 
