@@ -155,9 +155,6 @@ create_kernel_for () {
   rm -f $BUILD_RESULTS/$PI_VERSION/modules/lib/modules/*/build
   rm -f $BUILD_RESULTS/$PI_VERSION/modules/lib/modules/*/source
 
-  if [[ ! -z $CIRCLE_ARTIFACTS ]]; then
-    cp ../*.deb $CIRCLE_ARTIFACTS
-  fi
   mv ../*.deb $BUILD_RESULTS
   echo "###############"
   echo "### END building kernel for ${PI_VERSION}"
