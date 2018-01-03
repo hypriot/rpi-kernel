@@ -9,9 +9,9 @@ jobs:
           name: "Prepare"
           command: scripts/prepare_build_environment.sh
 
-      # - run:
-      #     name: "Build"
-      #     command: scripts/compile_kernel.sh
+      - run:
+          name: "Build"
+          command: scripts/compile_kernel.sh
 
       - store_artifacts:
           path: /var/kernel_build/results
