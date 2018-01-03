@@ -6,15 +6,12 @@ jobs:
       - checkout
 
       - run:
-          name: "Build image"
-          command: ./build.sh
-
-      - store_artifacts:
-          path: pi-gen/deploy
+          name: "Prepare"
+          command: scripts/prepare_build_environment.sh
 
       - run:
-          name: "Test image"
-          command: ./test.sh
+          name: "Build"
+          command: scripts/compile_kernel.sh
 
       - deploy:
           name: Deploy
