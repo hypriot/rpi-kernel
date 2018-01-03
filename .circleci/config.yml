@@ -1,0 +1,30 @@
+version: 2
+jobs:
+  build:
+    machine: true
+    steps:
+      - checkout
+
+      - run:
+          name: "Prepare"
+          command: scripts/prepare_build_environment.sh
+
+      - run:
+          name: "Build"
+          command: scripts/compile_kernel.sh
+
+      - store_artifacts:
+          path: output
+
+      - deploy:
+          name: Deploy
+          command: scripts/deploy.sh
+
+workflows:
+  version: 2
+  build_and_deploy:
+    jobs:
+      - build:
+          filters:
+            tags:
+              only: /.*/
