@@ -1,0 +1,30 @@
+version: 2
+jobs:
+  build:
+    machine: true
+    steps:
+      - checkout
+
+      - run:
+          name: "Build image"
+          command: ./build.sh
+
+      - store_artifacts:
+          path: pi-gen/deploy
+
+      - run:
+          name: "Test image"
+          command: ./test.sh
+
+      - deploy:
+          name: Deploy
+          command: ./deploy.sh
+
+workflows:
+  version: 2
+  build_and_deploy:
+    jobs:
+      - build:
+          filters:
+            tags:
+              only: /.*/
