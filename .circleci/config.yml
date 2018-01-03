@@ -9,13 +9,13 @@ jobs:
           name: "Prepare"
           command: scripts/prepare_build_environment.sh
 
-      - run:
-          name: "Build"
-          command: scripts/compile_kernel.sh
+      # - run:
+      #     name: "Build"
+      #     command: scripts/compile_kernel.sh
 
       - deploy:
           name: Deploy
-          command: ./deploy.sh
+          command: scripts/deploy.sh
 
 workflows:
   version: 2
