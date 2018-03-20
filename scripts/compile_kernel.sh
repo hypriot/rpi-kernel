@@ -13,7 +13,9 @@ BUILD_ROOT=/var/kernel_build
 BUILD_CACHE=$BUILD_ROOT/cache
 ARM_TOOLS=$BUILD_CACHE/tools
 LINUX_KERNEL=$BUILD_CACHE/linux-kernel
-LINUX_KERNEL_COMMIT=6820d0cbec64cfee481b961833feffec8880111e # Linux 4.9.59
+LINUX_KERNEL_COMMIT=be97febf4aa42b1d019ad24e7948739da8557f66 # Linux 4.9.80
+# LINUX_KERNEL_COMMIT=6820d0cbec64cfee481b961833feffec8880111e # Linux 4.9.59
+# LINUX_KERNEL_COMMIT=04c8e47067d4873c584395e5cb260b4f170a99ea # Linux 4.4.50
 # LINUX_KERNEL_COMMIT=04c8e47067d4873c584395e5cb260b4f170a99ea # Linux 4.4.50
 # LINUX_KERNEL_COMMIT=1ebe8d4a4c96cd6a90805c74233a468854960f67 # Linux 4.4.43
 # LINUX_KERNEL_COMMIT=5e46914b3417fe9ff42546dcacd0f41f9a0fb172 # Linux 4.4.39
@@ -30,7 +32,7 @@ if [ -d /vagrant ]; then
   # running in vagrant VM
   SRC_DIR=/vagrant
 else
-  # running in Circle build
+  # running in drone build
   SRC_DIR=`pwd`
   BUILD_USER=`id -u -n`
   BUILD_GROUP=`id -g -n`
@@ -46,6 +48,12 @@ X64_CROSS_COMPILE_CHAIN=arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64
 declare -A CCPREFIX
 CCPREFIX["rpi1"]=$ARM_TOOLS/$X64_CROSS_COMPILE_CHAIN/bin/arm-linux-gnueabihf-
 CCPREFIX["rpi2_3"]=$ARM_TOOLS/$X64_CROSS_COMPILE_CHAIN/bin/arm-linux-gnueabihf-
+
+declare -A DEFCONFIG
+#DEFCONFIG["rpi1"]=bcmrpi_defconfig
+#DEFCONFIG["rpi2_3"]=bcm2709_defconfig
+DEFCONFIG["rpi1"]=rpi1_docker_defconfig
+DEFCONFIG["rpi2_3"]=rpi2_3_docker_defconfig
 
 declare -A IMAGE_NAME
 IMAGE_NAME["rpi1"]=kernel.img
@@ -69,13 +77,13 @@ function clone_or_update_repo_for () {
   local repo_path=$2
   local repo_commit=$3
 
-  if [ ! -z "${repo_commit}" ]; then
-    rm -rf $repo_path
-  fi
+  #if [ ! -z "${repo_commit}" ]; then
+  #  rm -rf $repo_path
+  #fi
   if [ -d ${repo_path}/.git ]; then
     pushd $repo_path
-    git reset --hard HEAD
-    git pull
+    # git reset --hard HEAD
+    # git pull
     popd
   else
     echo "Cloning $repo_path with commit $repo_commit"
@@ -101,6 +109,7 @@ function setup_linux_kernel_sources () {
 function setup_rpi_firmware () {
   echo "### Check if Raspberry Pi Firmware repository at ${LINUX_KERNEL} is still up to date"
   clone_or_update_repo_for 'https://github.com/RPi-Distro/firmware' $RASPBERRY_FIRMWARE ""
+  # clone_or_update_repo_for 'https://github.com/raspberrypi/firmware' $RASPBERRY_FIRMWARE ""
 }
 
 function prepare_kernel_building () {
@@ -136,6 +145,7 @@ create_kernel_for () {
   mkdir -p $BUILD_RESULTS/$PI_VERSION
   echo $KERNEL_COMMIT > $BUILD_RESULTS/kernel-commit.txt
   if [ ! -z "${MENUCONFIG}" ]; then
+    cp $LINUX_KERNEL/arch/arm/configs/${DEFCONFIG[${PI_VERSION}]} $LINUX_KERNEL/.config
     echo "### starting menuconfig"
     ARCH=arm CROSS_COMPILE=${CCPREFIX[$PI_VERSION]} make menuconfig
     echo "### saving new config back to $LINUX_KERNEL_CONFIGS/${PI_VERSION}_docker_kernel_config"
@@ -146,9 +156,10 @@ create_kernel_for () {
   fi
 
   echo "### building kernel and deb packages"
-  KBUILD_DEBARCH=armhf ARCH=arm CROSS_COMPILE=${CCPREFIX[${PI_VERSION}]} make ${PI_VERSION}_docker_defconfig deb-pkg -j$NUM_CPUS
+  KBUILD_DEBARCH=armhf ARCH=arm CROSS_COMPILE=${CCPREFIX[${PI_VERSION}]} make ${DEFCONFIG[${PI_VERSION}]} deb-pkg -j$NUM_CPUS
 
   ${LINUX_KERNEL}/scripts/mkknlimg --ddtk $LINUX_KERNEL/arch/arm/boot/Image $BUILD_RESULTS/$PI_VERSION/${IMAGE_NAME[${PI_VERSION}]}
+#  cp $LINUX_KERNEL/arch/arm/boot/Image $BUILD_RESULTS/$PI_VERSION/${IMAGE_NAME[${PI_VERSION}]}
 
   echo "### installing kernel modules"
   mkdir -p $BUILD_RESULTS/$PI_VERSION/modules
@@ -159,6 +170,9 @@ create_kernel_for () {
   rm -f $BUILD_RESULTS/$PI_VERSION/modules/lib/modules/*/build
   rm -f $BUILD_RESULTS/$PI_VERSION/modules/lib/modules/*/source
 
+  if [[ ! -z $CIRCLE_ARTIFACTS ]]; then
+    cp ../*.deb $CIRCLE_ARTIFACTS
+  fi
   mv ../*.deb $BUILD_RESULTS
   echo "###############"
   echo "### END building kernel for ${PI_VERSION}"
@@ -188,6 +202,8 @@ function create_kernel_deb_packages () {
     cp $BUILD_RESULTS/$pi_version/${IMAGE_NAME[${pi_version}]} $NEW_KERNEL/boot
     cp -R $BUILD_RESULTS/$pi_version/modules/lib/modules/* $NEW_KERNEL/modules
   done
+  echo "copying dtb files to $NEW_KERNEL/boot"
+  cp $LINUX_KERNEL/arch/arm/boot/dts/bcm27*.dtb $NEW_KERNEL/boot
   # build debian packages
   cd $NEW_KERNEL
 
@@ -212,7 +228,7 @@ echo "*** the kernel timestamp is: $NEW_VERSION ***"
 echo "#############################################"
 
 # clear build cache to fetch the current raspberry/firmware
-sudo rm -rf $RASPBERRY_FIRMWARE
+#sudo rm -rf $RASPBERRY_FIRMWARE
 
 # setup necessary build environment: dir, repos, etc.
 prepare_kernel_building
@@ -230,7 +246,7 @@ if [ -d /vagrant ]; then
   # copy build results to synced vagrant host folder
   FINAL_BUILD_RESULTS=/vagrant/build_results/$NEW_VERSION
 else
-  # running in Circle build
+  # running in drone build
   FINAL_BUILD_RESULTS=$SRC_DIR/output/$NEW_VERSION
 fi
 
