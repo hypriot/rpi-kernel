@@ -32,7 +32,7 @@ if [ -d /vagrant ]; then
   # running in vagrant VM
   SRC_DIR=/vagrant
 else
-  # running in drone build
+  # running in Circle build
   SRC_DIR=`pwd`
   BUILD_USER=`id -u -n`
   BUILD_GROUP=`id -g -n`
@@ -77,13 +77,13 @@ function clone_or_update_repo_for () {
   local repo_path=$2
   local repo_commit=$3
 
-  #if [ ! -z "${repo_commit}" ]; then
-  #  rm -rf $repo_path
-  #fi
+  if [ ! -z "${repo_commit}" ]; then
+   rm -rf $repo_path
+  fi
   if [ -d ${repo_path}/.git ]; then
     pushd $repo_path
-    # git reset --hard HEAD
-    # git pull
+    git reset --hard HEAD
+    git pull
     popd
   else
     echo "Cloning $repo_path with commit $repo_commit"
@@ -109,7 +109,6 @@ function setup_linux_kernel_sources () {
 function setup_rpi_firmware () {
   echo "### Check if Raspberry Pi Firmware repository at ${LINUX_KERNEL} is still up to date"
   clone_or_update_repo_for 'https://github.com/RPi-Distro/firmware' $RASPBERRY_FIRMWARE ""
-  # clone_or_update_repo_for 'https://github.com/raspberrypi/firmware' $RASPBERRY_FIRMWARE ""
 }
 
 function prepare_kernel_building () {
@@ -159,7 +158,6 @@ create_kernel_for () {
   KBUILD_DEBARCH=armhf ARCH=arm CROSS_COMPILE=${CCPREFIX[${PI_VERSION}]} make ${DEFCONFIG[${PI_VERSION}]} deb-pkg -j$NUM_CPUS
 
   ${LINUX_KERNEL}/scripts/mkknlimg --ddtk $LINUX_KERNEL/arch/arm/boot/Image $BUILD_RESULTS/$PI_VERSION/${IMAGE_NAME[${PI_VERSION}]}
-#  cp $LINUX_KERNEL/arch/arm/boot/Image $BUILD_RESULTS/$PI_VERSION/${IMAGE_NAME[${PI_VERSION}]}
 
   echo "### installing kernel modules"
   mkdir -p $BUILD_RESULTS/$PI_VERSION/modules
@@ -228,7 +226,7 @@ echo "*** the kernel timestamp is: $NEW_VERSION ***"
 echo "#############################################"
 
 # clear build cache to fetch the current raspberry/firmware
-#sudo rm -rf $RASPBERRY_FIRMWARE
+sudo rm -fr $RASPBERRY_FIRMWARE
 
 # setup necessary build environment: dir, repos, etc.
 prepare_kernel_building
@@ -246,7 +244,7 @@ if [ -d /vagrant ]; then
   # copy build results to synced vagrant host folder
   FINAL_BUILD_RESULTS=/vagrant/build_results/$NEW_VERSION
 else
-  # running in drone build
+  # running in Circle build
   FINAL_BUILD_RESULTS=$SRC_DIR/output/$NEW_VERSION
 fi
 
