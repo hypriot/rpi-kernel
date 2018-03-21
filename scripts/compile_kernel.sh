@@ -78,7 +78,7 @@ function clone_or_update_repo_for () {
   local repo_commit=$3
 
   if [ ! -z "${repo_commit}" ]; then
-   rm -rf $repo_path
+    rm -rf $repo_path
   fi
   if [ -d ${repo_path}/.git ]; then
     pushd $repo_path
