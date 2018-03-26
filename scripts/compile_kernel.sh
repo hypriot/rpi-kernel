@@ -41,6 +41,7 @@ fi
 LINUX_KERNEL_CONFIGS=$SRC_DIR/kernel_configs
 
 NEW_VERSION=`date +%Y%m%d-%H%M%S`
+
 BUILD_RESULTS=$BUILD_ROOT/results/kernel-$NEW_VERSION
 
 X64_CROSS_COMPILE_CHAIN=arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64
@@ -157,7 +158,12 @@ create_kernel_for () {
   echo "### building kernel and deb packages"
   KBUILD_DEBARCH=armhf ARCH=arm CROSS_COMPILE=${CCPREFIX[${PI_VERSION}]} make ${DEFCONFIG[${PI_VERSION}]} deb-pkg -j$NUM_CPUS
 
-  ${LINUX_KERNEL}/scripts/mkknlimg --ddtk $LINUX_KERNEL/arch/arm/boot/Image $BUILD_RESULTS/$PI_VERSION/${IMAGE_NAME[${PI_VERSION}]}
+  version=$(${LINUX_KERNEL}/scripts/mkknlimg --ddtk $LINUX_KERNEL/arch/arm/boot/Image $BUILD_RESULTS/$PI_VERSION/${IMAGE_NAME[${PI_VERSION}]} | head -1 | sed 's/Version: //')
+  suffix=""
+  if [ "$PI_VERSION" == "rpi2_3" ]; then
+    suffix="7"
+  fi
+  echo "$version" > $RASPBERRY_FIRMWARE/extra/uname_string$suffix
 
   echo "### installing kernel modules"
   mkdir -p $BUILD_RESULTS/$PI_VERSION/modules
@@ -190,11 +196,16 @@ function create_kernel_deb_packages () {
   # copy over source files for building the packages
   echo "copying firmware from $RASPBERRY_FIRMWARE to $NEW_KERNEL"
   # skip modules directory from standard tree, because we will our on modules below
-  tar --exclude=modules --exclude=.git -C $RASPBERRY_FIRMWARE -cf - . | tar -C $NEW_KERNEL -xvf -
+  tar --exclude=modules --exclude=headers --exclude=.git -C $RASPBERRY_FIRMWARE -cf - . | tar -C $NEW_KERNEL -xvf -
   # create an empty modules directory, because we have skipped this above
   mkdir -p $NEW_KERNEL/modules/
   cp -r $SRC_DIR/debian $NEW_KERNEL/debian
   touch $NEW_KERNEL/debian/files
+
+  mkdir -p $NEW_KERNEL/headers/
+  for deb in $BUILD_RESULTS/linux-headers-*.deb; do
+    dpkg -x $deb $NEW_KERNEL/headers/
+  done
 
   for pi_version in ${!CCPREFIX[@]}; do
     cp $BUILD_RESULTS/$pi_version/${IMAGE_NAME[${pi_version}]} $NEW_KERNEL/boot
@@ -204,6 +215,8 @@ function create_kernel_deb_packages () {
   cp $LINUX_KERNEL/arch/arm/boot/dts/bcm27*.dtb $NEW_KERNEL/boot
   # build debian packages
   cd $NEW_KERNEL
+
+  (cd $NEW_KERNEL/debian ; ./gen_bootloader_postinst_preinst.sh)
 
   dch -v ${NEW_VERSION} --package raspberrypi-firmware 'add Hypriot custom kernel'
   debuild --no-lintian -ePATH=${PATH}:$ARM_TOOLS/$X64_CROSS_COMPILE_CHAIN/bin -b -aarmhf -us -uc
