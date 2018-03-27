@@ -10,7 +10,6 @@ if [ "$CIRCLE_TAG" != "" ]; then
   unzip ghr.zip
   mkdir ghroutput
   cp output/*/raspberrypi-kernel*.deb ghroutput/
-  cp output/*/linux-libc-dev*.deb ghroutput/
 
   if [[ $CIRCLE_TAG = *"rc"* ]]; then
     pre=-prerelease
