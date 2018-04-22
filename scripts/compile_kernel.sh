@@ -143,7 +143,7 @@ create_kernel_for () {
 
   # copy kernel configuration file over
   cp $LINUX_KERNEL/arch/arm/configs/${ORIGDEFCONFIG[${PI_VERSION}]} $LINUX_KERNEL/arch/arm/configs/${DEFCONFIG[${PI_VERSION}]}
-  tee -a $LINUX_KERNEL_CONFIGS/docker_delta_defconfig $LINUX_KERNEL/arch/arm/configs/${DEFCONFIG[${PI_VERSION}]}
+  cat $LINUX_KERNEL_CONFIGS/docker_delta_defconfig >> $LINUX_KERNEL/arch/arm/configs/${DEFCONFIG[${PI_VERSION}]}
 
   echo "### building kernel"
   mkdir -p $BUILD_RESULTS/$PI_VERSION
