@@ -13,7 +13,8 @@ BUILD_ROOT=/var/kernel_build
 BUILD_CACHE=$BUILD_ROOT/cache
 ARM_TOOLS=$BUILD_CACHE/tools
 LINUX_KERNEL=$BUILD_CACHE/linux-kernel
-LINUX_KERNEL_COMMIT=be97febf4aa42b1d019ad24e7948739da8557f66 # Linux 4.9.80
+LINUX_KERNEL_COMMIT=f70eae405b5d75f7c41ea300b9f790656f99a203 # Linux 4.14.34
+# LINUX_KERNEL_COMMIT=be97febf4aa42b1d019ad24e7948739da8557f66 # Linux 4.9.80
 # LINUX_KERNEL_COMMIT=6820d0cbec64cfee481b961833feffec8880111e # Linux 4.9.59
 # LINUX_KERNEL_COMMIT=04c8e47067d4873c584395e5cb260b4f170a99ea # Linux 4.4.50
 # LINUX_KERNEL_COMMIT=04c8e47067d4873c584395e5cb260b4f170a99ea # Linux 4.4.50
@@ -50,9 +51,11 @@ declare -A CCPREFIX
 CCPREFIX["rpi1"]=$ARM_TOOLS/$X64_CROSS_COMPILE_CHAIN/bin/arm-linux-gnueabihf-
 CCPREFIX["rpi2_3"]=$ARM_TOOLS/$X64_CROSS_COMPILE_CHAIN/bin/arm-linux-gnueabihf-
 
+declare -A ORIGDEFCONFIG
+ORIGDEFCONFIG["rpi1"]=bcmrpi_defconfig
+ORIGDEFCONFIG["rpi2_3"]=bcm2709_defconfig
+
 declare -A DEFCONFIG
-#DEFCONFIG["rpi1"]=bcmrpi_defconfig
-#DEFCONFIG["rpi2_3"]=bcm2709_defconfig
 DEFCONFIG["rpi1"]=rpi1_docker_defconfig
 DEFCONFIG["rpi2_3"]=rpi2_3_docker_defconfig
 
@@ -139,7 +142,8 @@ create_kernel_for () {
   make ARCH=arm clean
 
   # copy kernel configuration file over
-  cp $LINUX_KERNEL_CONFIGS/${PI_VERSION}_docker_defconfig $LINUX_KERNEL/arch/arm/configs/
+  cp $LINUX_KERNEL/arch/arm/configs/${ORIGDEFCONFIG[${PI_VERSION}]} $LINUX_KERNEL/arch/arm/configs/${DEFCONFIG[${PI_VERSION}]}
+  cat $LINUX_KERNEL_CONFIGS/docker_delta_defconfig >> $LINUX_KERNEL/arch/arm/configs/${DEFCONFIG[${PI_VERSION}]}
 
   echo "### building kernel"
   mkdir -p $BUILD_RESULTS/$PI_VERSION
