@@ -1,7 +1,8 @@
 version: 2
 jobs:
   build:
-    machine: true
+    docker:
+      - image: buildpack-deps:trusty-scm
     steps:
       - checkout
 
