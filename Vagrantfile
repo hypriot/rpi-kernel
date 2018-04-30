@@ -30,7 +30,7 @@ def get_cpu_setting(host)
 end
 
 Vagrant.configure(2) do |config|
-  config.vm.box = "boxcutter/ubuntu1404"
+  override.vm.box = "ubuntu/trusty64"
   config.vm.synced_folder ".", "/vagrant"
   config.vm.define "docker-raspbian" do |config|
     config.vm.hostname = "docker-raspbian"
