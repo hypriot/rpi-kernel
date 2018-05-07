@@ -30,18 +30,23 @@ def get_cpu_setting(host)
 end
 
 Vagrant.configure(2) do |config|
-  config.vm.box = "boxcutter/ubuntu1404"
   config.vm.synced_folder ".", "/vagrant"
   config.vm.define "docker-raspbian" do |config|
     config.vm.hostname = "docker-raspbian"
     config.ssh.forward_agent = true
     config.vm.provision "shell", path: "scripts/provision.sh", privileged: false
-    config.vm.provider "virtualbox" do |vb|
+    config.vm.provider "virtualbox" do |vb, override|
+       override.vm.box = "ubuntu/trusty64"
        # find out on which host os we are running
        host = RbConfig::CONFIG['host_os']
        vb.customize ["modifyvm", :id, "--ioapic", "on"]
        vb.memory = get_memory_setting(host)
        vb.cpus = get_cpu_setting(host)
+    end
+    config.vm.provider "docker" do |docker|
+      docker.image = "tknerr/baseimage-ubuntu:14.04"
+      docker.has_ssh = true
+      docker.remains_running = false
     end
   end
 end
