@@ -67,8 +67,8 @@ IMAGE_NAME["rpi2_3"]=kernel7.img
 function create_dir_for_build_user () {
     local target_dir=$1
 
-    sudo mkdir -p $target_dir
-    sudo chown $BUILD_USER:$BUILD_GROUP $target_dir
+    mkdir -p $target_dir
+    chown $BUILD_USER:$BUILD_GROUP $target_dir
 }
 
 function setup_build_dirs () {
@@ -244,7 +244,7 @@ echo "*** the kernel timestamp is: $NEW_VERSION ***"
 echo "#############################################"
 
 # clear build cache to fetch the current raspberry/firmware
-sudo rm -fr $RASPBERRY_FIRMWARE
+rm -fr $RASPBERRY_FIRMWARE
 
 # setup necessary build environment: dir, repos, etc.
 prepare_kernel_building
