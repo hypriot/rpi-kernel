@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: buildpack-deps:trusty-scm
+      - image: buildpack-deps:bionic-scm
     steps:
       - checkout
 
