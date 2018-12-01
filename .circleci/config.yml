@@ -17,7 +17,7 @@ jobs:
       - store_artifacts:
           path: output
 
-      - list:
+      - run:
           name: List deb files
           command: dpkg -c output/*/raspberrypi-kernel_*.deb
 
