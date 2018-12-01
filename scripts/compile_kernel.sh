@@ -175,6 +175,9 @@ create_kernel_for () {
   mkdir -p $BUILD_RESULTS/$PI_VERSION/modules
   ARCH=arm CROSS_COMPILE=${CCPREFIX[${PI_VERSION}]} INSTALL_MOD_PATH=$BUILD_RESULTS/$PI_VERSION/modules make modules_install -j$NUM_CPUS
 
+  echo "### Listing $BUILD_RESULTS/$PI_VERSION/modules"
+  ls -l $BUILD_RESULTS/$PI_VERSION/modules
+
   # remove symlinks, mustn't be part of raspberrypi-bootloader*.deb
   echo "### removing symlinks"
   rm -f $BUILD_RESULTS/$PI_VERSION/modules/lib/modules/*/build
