@@ -17,6 +17,10 @@ jobs:
       - store_artifacts:
           path: output
 
+      - list:
+          name: List deb files
+          command: dpkg -c output/*/raspberrypi-kernel_*.deb
+
       - deploy:
           name: Deploy
           command: scripts/deploy.sh
