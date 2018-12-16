@@ -36,15 +36,17 @@ Vagrant.configure(2) do |config|
     config.ssh.forward_agent = true
     config.vm.provision "shell", path: "scripts/provision.sh", privileged: false
     config.vm.provider "virtualbox" do |vb, override|
-       override.vm.box = "ubuntu/trusty64"
+       override.vm.box = "ubuntu/cosmic64"
        # find out on which host os we are running
        host = RbConfig::CONFIG['host_os']
        vb.customize ["modifyvm", :id, "--ioapic", "on"]
-       vb.memory = get_memory_setting(host)
+       vb.memory = "4096"
+       config.disksize.size = '50GB'
        vb.cpus = get_cpu_setting(host)
     end
     config.vm.provider "docker" do |docker|
-      docker.image = "tknerr/baseimage-ubuntu:14.04"
+      docker.image = "ubuntu/cosmic64"
+      docker.disksize.size = '50GB'
       docker.has_ssh = true
       docker.remains_running = false
     end
